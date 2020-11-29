@@ -1,0 +1,16 @@
+{
+    "name": "pilot114/cli_engine",
+    "description": "cli engine",
+    "authors": [
+        {
+            "name": "Oleg Chulkov",
+            "email": "pilot114@bk.ru"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "CliEngine\\": "src/"
+        }
+    }
+}
