@@ -9,4 +9,5 @@ $t->rows = 20;
 
 $c = new \CliEngine\Draw\Canvas($t);
 
+$c->build();
 $c->live();

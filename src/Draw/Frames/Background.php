@@ -11,25 +11,25 @@ class Background
     public $x = 0;
     public $y = 0;
     public $terminal;
+    public $symbol;
 
     public function __construct(Terminal $terminal)
     {
         $this->terminal = $terminal;
+        $unicode = new Unicode();
+        $symbols = $unicode->getDiap('Блочные элементы');
+        $this->symbol = $symbols[array_rand($symbols)];
     }
 
     public function getTemplate()
     {
-        $unicode = new Unicode();
-        $symbols = $unicode->getDiap('Блочные элементы');
-        $symbol = $symbols[array_rand($symbols)];
-
         $block = [];
         $row = 0;
         while ($row < $this->terminal->rows) {
             $col = 0;
             $line = '';
             while ($col < $this->terminal->cols) {
-                $line .= $symbol;
+                $line .= $this->symbol;
                 $col++;
             }
             $row++;

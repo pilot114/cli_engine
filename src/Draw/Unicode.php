@@ -64,4 +64,16 @@ class Unicode
     {
         return @iconv('UCS-4LE', 'UTF-8', pack('V', $i));
     }
+
+    public function printAll()
+    {
+        foreach ($this->diaps as $diap) {
+            echo "$diap[2]\n";
+            $symbols = $this->getDiap($diap[2]);
+            foreach ($symbols as $symbol) {
+                echo sprintf("%s: %s", $symbol, strlen($symbol));
+            }
+            echo "\n";
+        }
+    }
 }

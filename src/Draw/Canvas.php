@@ -18,7 +18,8 @@ class Canvas
     protected $isNeedDraw = true;
 
     // участки для отрисовки
-//    protected $frames = [];
+    protected $back = null;
+    protected $frames = [];
 
     public function __construct(Terminal $t)
     {
@@ -32,20 +33,17 @@ class Canvas
         $mask = $b->getTemplate();
 
         $result = [];
-
         $row = 0;
         while ($row < $this->terminal->rows) {
             $col = 0;
             $line = '';
             while ($col < $this->terminal->cols) {
                 if (
-                    $row >= $b->y && $row-1 <= $b->getHeight()
+                    $row >= $b->y && $row+1 <= ($b->y + $b->getHeight())
                     &&
-                    $col >= $b->x && $col-1 <= $b->getWidth()
+                    $col >= $b->x && $col+1 <= ($b->x + $b->getWidth())
                 ) {
-                    $char = mb_substr($mask[$row - $b->y], $col - $b->x, 1);
-                    $tmp = iconv(mb_detect_encoding($char, mb_detect_order(), true), "UTF-8", $char);
-                    $line .= $tmp;
+                    $line .= mb_substr($mask[$row - $b->y], $col - $b->x, 1);
                 } else {
                     $line .= mb_substr($base[$row], $col, 1);
                 }
@@ -58,17 +56,22 @@ class Canvas
         return $result;
     }
 
+    public function build()
+    {
+        $this->back = new Background($this->terminal);
+        $this->frames = [
+            'example' => new Example()
+        ];
+    }
+
     public function render()
     {
+        $page = $this->back->getTemplate();
+        foreach ($this->frames as $frame) {
+            $page = $this->merge($page, $frame);
+        }
 
-        $base = new Background($this->terminal);
-        $frame = new Example();
-
-        $result = $this->merge($base->getTemplate(), $frame);
-
-        var_dump($result);
-        die();
-        return implode("\n", $result);
+        return implode("\n", $page) . "\n";
     }
 
     public function live()
@@ -76,8 +79,7 @@ class Canvas
         // чтобы ожидание ввода не блокировало вывод
         stream_set_blocking(STDIN, false);
         // выключаем вывод на экран пользовательского ввода
-        readline_callback_handler_install('', function () {
-        });
+        readline_callback_handler_install('', function () {});
         // скрываем курсор и очищаем экран
         $this->terminal->cursor('hide');
         $this->terminal->erase('screen');
@@ -86,7 +88,7 @@ class Canvas
 
         while (true) {
             if ($string = fgets(STDIN)) {
-                $this->keyboard->handle($string);
+                $this->keyboard->handle($string, $this->frames);
                 $this->isNeedDraw = true;
             }
             if ($this->isNeedDraw) {
@@ -94,7 +96,7 @@ class Canvas
                 $this->terminal->cursor('up', $this->terminal->rows);
                 $this->isNeedDraw = false;
             }
-            usleep(1000); // 1 мс
+//            usleep(1000); // 1 мс
         }
     }
 }

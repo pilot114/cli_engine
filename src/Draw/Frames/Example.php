@@ -12,10 +12,10 @@ class Example
     public function getTemplate()
     {
         $block = [
-            '** Test *********',
-            '* Who are you ? *',
-            '*               *',
-            '*****************',
+            '** Test ********',
+            '* abababababab *',
+            '* 😝😝😝😝😝😝 *',
+            '****************',
         ];
         return $block;
     }

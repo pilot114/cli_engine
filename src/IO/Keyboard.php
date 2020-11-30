@@ -19,7 +19,7 @@ class Keyboard
         '1b5b44' => 'LEFT',
     ];
 
-    public function handle($key)
+    public function handle($key, $frames)
     {
         // многобайтные последовательности
         if (strlen($key) > 1) {
@@ -32,6 +32,18 @@ class Keyboard
 
         if ($nameKey === 'ESC') exit;
 
-        if ($nameKey === 'ESC') exit;
+        $ctrl = $frames['example'];
+        if ($nameKey === 'LEFT') {
+            $ctrl->x -= 1;
+        }
+        if ($nameKey === 'RIGHT') {
+            $ctrl->x += 1;
+        }
+        if ($nameKey === 'UP') {
+            $ctrl->y -= 1;
+        }
+        if ($nameKey === 'DOWN') {
+            $ctrl->y += 1;
+        }
     }
 }
