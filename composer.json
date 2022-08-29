@@ -7,7 +7,12 @@
             "email": "pilot114@bk.ru"
         }
     ],
-    "require": {},
+    "require": {
+      "ext-mbstring": "*",
+      "ext-readline": "*",
+      "ext-posix": "*",
+      "ext-iconv": "*"
+    },
     "autoload": {
         "psr-4": {
             "CliEngine\\": "src/"

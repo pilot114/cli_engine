@@ -3,6 +3,7 @@
 namespace CliEngine\Draw;
 
 use CliEngine\Draw\Frames\Background;
+use CliEngine\Draw\Frames\IFrame;
 use CliEngine\IO\Keyboard;
 use CliEngine\IO\Terminal;
 use CliEngine\Draw\Frames\Example;
@@ -12,14 +13,14 @@ use CliEngine\Draw\Frames\Example;
  */
 class Canvas
 {
-    protected $terminal;
-    protected $keyboard;
-    protected $unicode;
-    protected $isNeedDraw = true;
+    protected Terminal $terminal;
+    protected Keyboard $keyboard;
+    protected Unicode $unicode;
+    protected bool $isNeedDraw = true;
 
     // участки для отрисовки
-    protected $back = null;
-    protected $frames = [];
+    protected Background $back;
+    protected array $frames = [];
 
     public function __construct(Terminal $t)
     {
@@ -28,9 +29,9 @@ class Canvas
         $this->terminal = $t;
     }
 
-    public function merge($base, $b)
+    public function merge(array $base, IFrame $frame): array
     {
-        $mask = $b->getTemplate();
+        $mask = $frame->getTemplate();
 
         $result = [];
         $row = 0;
@@ -39,11 +40,11 @@ class Canvas
             $line = '';
             while ($col < $this->terminal->cols) {
                 if (
-                    $row >= $b->y && $row+1 <= ($b->y + $b->getHeight())
+                    $row >= $frame->y && $row+1 <= ($frame->y + $frame->getHeight())
                     &&
-                    $col >= $b->x && $col+1 <= ($b->x + $b->getWidth())
+                    $col >= $frame->x && $col+1 <= ($frame->x + $frame->getWidth())
                 ) {
-                    $line .= mb_substr($mask[$row - $b->y], $col - $b->x, 1);
+                    $line .= mb_substr($mask[$row - $frame->y], $col - $frame->x, 1);
                 } else {
                     $line .= mb_substr($base[$row], $col, 1);
                 }
@@ -56,7 +57,7 @@ class Canvas
         return $result;
     }
 
-    public function build()
+    public function build(): void
     {
         $this->back = new Background($this->terminal);
         $this->frames = [
@@ -64,7 +65,7 @@ class Canvas
         ];
     }
 
-    public function render()
+    public function render(): string
     {
         $page = $this->back->getTemplate();
         foreach ($this->frames as $frame) {
@@ -79,7 +80,7 @@ class Canvas
         // чтобы ожидание ввода не блокировало вывод
         stream_set_blocking(STDIN, false);
         // выключаем вывод на экран пользовательского ввода
-        readline_callback_handler_install('', function () {});
+        readline_callback_handler_install('', fn() => null);
         // скрываем курсор и очищаем экран
         $this->terminal->cursor('hide');
         $this->terminal->erase('screen');
@@ -96,7 +97,7 @@ class Canvas
                 $this->terminal->cursor('up', $this->terminal->rows);
                 $this->isNeedDraw = false;
             }
-//            usleep(1000); // 1 мс
+            usleep(0);
         }
     }
 }

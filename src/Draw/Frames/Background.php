@@ -1,17 +1,16 @@
 <?php
 
-
 namespace CliEngine\Draw\Frames;
 
 use CliEngine\Draw\Unicode;
 use CliEngine\IO\Terminal;
 
-class Background
+class Background implements IFrame
 {
-    public $x = 0;
-    public $y = 0;
-    public $terminal;
-    public $symbol;
+    public int $x = 0;
+    public int $y = 0;
+    public Terminal $terminal;
+    public string $symbol;
 
     public function __construct(Terminal $terminal)
     {
@@ -21,7 +20,7 @@ class Background
         $this->symbol = $symbols[array_rand($symbols)];
     }
 
-    public function getTemplate()
+    public function getTemplate(): array
     {
         $block = [];
         $row = 0;
@@ -38,12 +37,12 @@ class Background
         return $block;
     }
 
-    public function getWidth()
+    public function getWidth(): int
     {
         return mb_strlen($this->getTemplate()[0]);
     }
 
-    public function getHeight()
+    public function getHeight(): int
     {
         return count($this->getTemplate());
     }

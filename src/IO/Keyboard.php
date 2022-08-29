@@ -7,7 +7,7 @@ namespace CliEngine\IO;
  */
 class Keyboard
 {
-    public $control = [
+    public array $control = [
         27 => 'ESC',
         9 => 'TAB',
         32 => 'SPACE',
@@ -19,31 +19,20 @@ class Keyboard
         '1b5b44' => 'LEFT',
     ];
 
-    public function handle($key, $frames)
+    public function handle(string $key, array $frames): void
     {
         // многобайтные последовательности
-        if (strlen($key) > 1) {
-            $key = bin2hex($key);
-        } else {
-            $key = ord($key);
-        }
+        $key = (strlen($key) > 1) ? bin2hex($key) : ord($key);
 
         $nameKey = $this->control[$key] ?? chr($key);
-
-        if ($nameKey === 'ESC') exit;
-
         $ctrl = $frames['example'];
-        if ($nameKey === 'LEFT') {
-            $ctrl->x -= 1;
-        }
-        if ($nameKey === 'RIGHT') {
-            $ctrl->x += 1;
-        }
-        if ($nameKey === 'UP') {
-            $ctrl->y -= 1;
-        }
-        if ($nameKey === 'DOWN') {
-            $ctrl->y += 1;
-        }
+
+        match ($nameKey) {
+            'ESC'   => exit,
+            'LEFT'  => $ctrl->x -= 1,
+            'RIGHT' => $ctrl->x += 1,
+            'UP'    => $ctrl->y -= 1,
+            'DOWN'  => $ctrl->y += 1,
+        };
     }
 }

@@ -7,12 +7,12 @@ namespace CliEngine\IO;
  */
 class Terminal
 {
-    public $isCli;
-    public $isPiped;
+    public bool $isCli;
+    public bool $isPiped;
 
-    public $rows;
-    public $cols;
-    public $colors;
+    public int $rows;
+    public int $cols;
+    public int $colors;
 
     // стили
     const RESET = 'reset';
@@ -34,42 +34,31 @@ class Terminal
 
     public function __construct()
     {
-        $this->isCli = substr(php_sapi_name(), 0, 3) === 'cli';
+        $this->isCli = str_starts_with(php_sapi_name(), 'cli');
         $this->isPiped = !posix_isatty(STDOUT);
 
         $this->tputInfo();
     }
 
-    public function tputInfo()
+    public function tputInfo(): void
     {
-        $rows = intval(`tput lines`);
-        $cols = intval(`tput cols`);
-        $colors = max(8, intval(`tput colors`));
-        $this->rows = $rows;
-        $this->cols = $cols;
-        $this->colors = $colors;
+        $this->rows = intval(`tput lines`);
+        $this->cols = intval(`tput cols`);
+        $this->colors = max(8, intval(`tput colors`));
     }
 
     /**
      * Вывод данных
-     *
-     * @param $message
-     * @param false $appendEndLine
      */
-    public function out($message, $appendEndLine = false, $stream = STDOUT)
+    public function out(string $message, bool $appendEndLine = false, $stream = STDOUT): void
     {
         fwrite($stream, $message . ($appendEndLine ? PHP_EOL : ""));
     }
 
     /**
      * Перемещение курсора
-     *
-     * @param $commandName
-     * @param int $count
-     * @param int $row
-     * @param int $column
      */
-    public function cursor($commandName, $count = 1, $row = 1, $column = 1)
+    public function cursor(string $commandName, int $count = 1, int $row = 1, int $column = 1): void
     {
         $commands = [
             'up'    => "\033[{$count}A",
@@ -89,10 +78,8 @@ class Terminal
 
     /**
      * Очистить часть экрана, относительно курсора
-     *
-     * @param $commandName
      */
-    public function erase($commandName)
+    public function erase(string $commandName): void
     {
         $commands = [
             'screen' => "\033[2J",
@@ -115,7 +102,7 @@ class Terminal
      * @param $backColor
      * @param $style
      */
-    public function setStyle($frontColor, $backColor = null, $style = null)
+    public function setStyle($frontColor, $backColor = null, $style = null): void
     {
         $frontColors = [
             30 => self::BLACK, self::RED, self::GREEN, self::YELLOW,
@@ -144,15 +131,12 @@ class Terminal
     /**
      * Звоночек
      */
-    public function bell()
+    public function bell(): void
     {
         $this->out("\007", false, STDERR);
     }
 
-
-
-
-    public function progress($bar = false)
+    public function progress($bar = false): void
     {
         $this->cursor('save');
         $i = 0;
@@ -173,9 +157,9 @@ class Terminal
     }
 
     /**
-     * Ожидание ввода TODO
+     * Ожидание ввода
      */
-    public function wait()
+    public function wait(): void
     {
         $this->out("you sure? (y/n):", false, STDERR);
         if (strtolower(fread(STDIN, 1)) === 'y') {
@@ -185,10 +169,7 @@ class Terminal
         }
     }
 
-    /**
-     * TODO
-     */
-    public function handleInput()
+    public function handleInput(): void
     {
         $line = fgets(STDIN);
         if ($line) {

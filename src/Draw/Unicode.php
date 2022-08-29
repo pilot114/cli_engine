@@ -7,7 +7,7 @@ namespace CliEngine\Draw;
  */
 class Unicode
 {
-    protected $diaps = [
+    protected array $diaps = [
         ['0020', '007E', 'Основная латиница'],
         ['00A0', '00FF', 'Дополнение к латинице — 1'],
         ['0250', '02AF', 'Международный фонетический алфавит'],
@@ -42,11 +42,9 @@ class Unicode
         ['1FA70', '1FAFF', 'Расширенные символы и пиктограммы — A'],
     ];
 
-    public function getDiap($name)
+    public function getDiap(string $name): array
     {
-        $diap = array_filter($this->diaps, function($item) use ($name) {
-            return $item[2] === $name;
-        });
+        $diap = array_filter($this->diaps, fn($x) => $x[2] === $name);
         $diap = $diap[array_key_first($diap)];
 
         $pos = hexdec($diap[0]);
@@ -55,17 +53,17 @@ class Unicode
         $symbols = [];
         while ($pos <= $end) {
             $pos++;
-            $symbols[] = $this->unichr($pos);
+            $symbols[] = $this->unichar($pos);
         }
         return $symbols;
     }
 
-    protected function unichr($i)
+    protected function unichar($i): bool|string
     {
         return @iconv('UCS-4LE', 'UTF-8', pack('V', $i));
     }
 
-    public function printAll()
+    public function printAll(): void
     {
         foreach ($this->diaps as $diap) {
             echo "$diap[2]\n";

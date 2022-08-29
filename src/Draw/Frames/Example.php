@@ -1,31 +1,28 @@
 <?php
 
-
 namespace CliEngine\Draw\Frames;
 
-
-class Example
+class Example implements IFrame
 {
-    public $x = 2;
-    public $y = 2;
+    public int $x = 2;
+    public int $y = 2;
 
-    public function getTemplate()
+    public function getTemplate(): array
     {
-        $block = [
+        return [
             '** Test ********',
             '* abababababab *',
             '* 😝😝😝😝😝😝 *',
             '****************',
         ];
-        return $block;
     }
 
-    public function getWidth()
+    public function getWidth(): int
     {
         return strlen($this->getTemplate()[0]);
     }
 
-    public function getHeight()
+    public function getHeight(): int
     {
         return count($this->getTemplate());
     }
